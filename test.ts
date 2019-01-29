@@ -13,7 +13,7 @@ var server = net.createServer( (c) => {
 
     c.on("data", (data)=>{
         console.log(data.toString())
-        c.write("Enter your next message:\n");
+        c.write(data.toString());
     });
 
     c.on("error", (error)=>{

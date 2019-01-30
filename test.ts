@@ -28,6 +28,9 @@ var server = net.createServer( (c) => {
         c.pipe(c);
     })
 });
+server.on("connect", ()=>{
+    console.log("--------connect!!!---------")
+});
 server.listen("/tmp/echo1.sock", function(){
     console.log("Listening ...");
 })

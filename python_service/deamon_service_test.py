@@ -1,5 +1,6 @@
 import sys
 import socket
+import msgpack
 
 # Create a UDS socket
 sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
@@ -17,7 +18,9 @@ try:
     
     # Send data
     message = b'This is the message.  It will be repeated.'
+    #message = msgpack.packb([1, 2, 3], use_bin_type=True)
     print('sending "%s"' % message)
+    
     sock.sendall(message)
 
     amount_received = 0
@@ -26,6 +29,10 @@ try:
     while amount_received < amount_expected:
         data = sock.recv(4096)
         amount_received += len(data)
+        print("--------------------")
+        received_data = msgpack.unpackb(data)
+        print(type(received_data))
+        print(received_data[0])
         print('received "%s"' % data)
 
 finally:

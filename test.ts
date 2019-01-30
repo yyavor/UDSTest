@@ -1,4 +1,5 @@
 import * as net from "net"
+import * as msgpack from "msgpack"
 
 var server = net.createServer( (c) => {
     console.log("Subscribe to all events");
@@ -13,11 +14,13 @@ var server = net.createServer( (c) => {
 
     c.on("data", (data)=>{
         console.log(data.toString())
-        c.write(data.toString());
+        var message = msgpack.pack([1, 2, 3, 34]);
+        c.write(message);
     });
 
     c.on("error", (error)=>{
         console.log("--------error---------")
+        console.log(error.message)
     });
 
     c.on("end", ()=>{

@@ -4,3 +4,5 @@ pyenv
 *.js
 *.js.map
 *.pyc
+__pycache__
+.idea

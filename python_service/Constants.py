@@ -1,0 +1,1 @@
+MESSAGE_SOCKET_FILE_NAME = "imp_msg.sock"

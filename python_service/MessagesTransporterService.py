@@ -1,34 +1,38 @@
+import socket
 import tempfile
+from os import unlink
 from os.path import abspath, join, exists
+from Constants import MESSAGE_SOCKET_FILE_NAME
+from threading import Thread
+
 
 class MessagesSocketServer:
-    _messages_socket_file = abspath(join(tempfile.gettempdir(), "imp_msg.sock"))
+    _messages_socket_file = abspath(join(tempfile.gettempdir(), MESSAGE_SOCKET_FILE_NAME))
 
     def __init__(self):
-        self._clients = {}
+        self._clients = list()
         self._server = None
 
-    def start(self):
-        if not self._free_socket_file():
-            return False
+    def create(self):
+        self._free_socket_file()
         self._initialize_socket_listening()
-        return True
-        
+
+    def listen_to_connection(self, connection):
+        while True:
+            data = connection.recv(4069)
+            print(data)
 
     def _initialize_socket_listening(self):
         try:
             sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-            sock.listen(1)
+            sock.bind(self._messages_socket_file)
+            sock.listen(5)
 
             while True:
-                # Wait for a connection
                 connection, client_address = sock.accept()
-                try:
-                    data = connection.recv(4096)
-                        
-                finally:
-                    # Clean up the connection
-                    connection.close()  
+                listener = Thread(target=self.listen_to_connection, args=(connection,))
+                listener.start()
+
         except Exception as error_message:
             print("Failed to initialize socket listening:")
             print(error_message)
@@ -39,18 +43,18 @@ class MessagesSocketServer:
             return True
         try:
             print("Unlink {}".format(self._messages_socket_file))
-            os.unlink(server_address)
+            unlink(self._messages_socket_file)
             return True
         except Exception as error_message:
             print("Something went wrong: {}".format(error_message))
         return False
 
-    
 
 class MessagesTransporter:
     pass
 
+
 if __name__ == "__main__":
     msg_socket_server = MessagesSocketServer()
-    if not msg_socket_server.start():
+    if not msg_socket_server.create():
         exit(1)
